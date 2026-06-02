@@ -64,6 +64,7 @@ import type {
 import { createLocalAgentJwt } from "../agent-auth-jwt.js";
 import { parseObject, asBoolean, asNumber, appendWithByteCap, MAX_EXCERPT_BYTES } from "../adapters/utils.js";
 import { costService } from "./costs.js";
+import { NO_PID_GRACE_MS } from "./process-lifecycle-constants.js";
 import { trackAgentFirstHeartbeat } from "@paperclipai/shared/telemetry";
 import { getTelemetryClient } from "../telemetry.js";
 import { companySkillService } from "./company-skills.js";
@@ -6747,7 +6748,6 @@ export function heartbeatService(db: Db, options: HeartbeatServiceOptions = {}) 
       // so the slot stays "occupied" long enough for the process to either finish
       // naturally or be caught by the periodic reaper (staleThresholdMs=5 min).
       if (tracksLocalChild && !run.processPid && !run.processGroupId) {
-        const NO_PID_GRACE_MS = 10 * 60 * 1000;
         const refTime = run.updatedAt ? new Date(run.updatedAt).getTime() : 0;
         if (now.getTime() - refTime < NO_PID_GRACE_MS) continue;
       }
